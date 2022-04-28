@@ -3,6 +3,7 @@ import React from "react";
 import {MediumText} from "../Text/DefaultText";
 import {useReduxDispatch} from "../../../redux";
 import {moveJokeToTop} from "../../../redux/state/JokeState";
+import Colors from "../../../constant/Colors";
 
 type JokeButtonProps = {
     id: number;
@@ -17,7 +18,7 @@ export const JokeButton = ({id}: JokeButtonProps): React.ReactElement => {
             style={{
                 width: 100,
                 height: 40,
-                backgroundColor: "#F56D91",
+                backgroundColor: Colors.goTop,
                 borderRadius: 8,
                 alignItems: "center",
                 justifyContent: "center",

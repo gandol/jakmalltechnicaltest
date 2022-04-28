@@ -1,16 +1,23 @@
 import React, {useEffect} from "react";
-import {ActivityIndicator, ScrollView, View} from "react-native";
+import {
+    ActivityIndicator,
+    RefreshControl,
+    ScrollView,
+    View,
+} from "react-native";
 import {JokeList} from "../component/molecules/Joke/Joke";
 import {useReduxDispatch, useReduxSelector} from "../redux";
-import {getJokeList, setJokes} from "../redux/state/JokeState";
+import {getJokeList, resetJokeList, setJokes} from "../redux/state/JokeState";
 import ApiCall from "../util/helper/ApiCall";
 import Endpoints from "../constant/Endpoints";
 import {DataJokesType, JokeType} from "../util/type/JokesType";
+import Colors from "../constant/Colors";
 
 export default function MainApp(): React.ReactElement {
+    const [refreshing, setRefreshing] = React.useState(false);
+
     const dispatch = useReduxDispatch();
     const jokeList = useReduxSelector(getJokeList);
-    console.log(jokeList);
 
     const getJokeListData = async (category: string) => {
         try {
@@ -26,13 +33,13 @@ export default function MainApp(): React.ReactElement {
             });
             return dataReturn;
         } catch (e) {
-            console.log(e);
             return [];
         }
     };
 
     const getCategories = async () => {
         try {
+            dispatch(resetJokeList());
             const {data} = await ApiCall.get(Endpoints.categories);
             const categories = data.categories;
             const CategoryWithJoke: DataJokesType[] = [];
@@ -46,9 +53,10 @@ export default function MainApp(): React.ReactElement {
                     isOpen: false,
                 });
             }
+            setRefreshing(false);
             dispatch(setJokes(CategoryWithJoke));
         } catch (e) {
-            console.log(e);
+            return;
         }
     };
 
@@ -57,11 +65,18 @@ export default function MainApp(): React.ReactElement {
     }, []);
 
     if (jokeList.length === 0) {
-        return <ActivityIndicator size="large" color="#0000ff" />;
+        return <ActivityIndicator size="small" color={Colors.activity} />;
     }
     return (
         <View style={{flex: 1, backgroundColor: "white"}}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={getCategories}
+                    />
+                }>
                 {jokeList.map((joke: DataJokesType, index) => {
                     if (joke.jokes.length === 0) return null;
                     return (

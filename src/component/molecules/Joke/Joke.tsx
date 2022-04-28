@@ -1,12 +1,17 @@
 import React from "react";
-import {Image, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, Image, TouchableOpacity, View} from "react-native";
 import {BoldText, MediumText, RegularText} from "../Text/DefaultText";
 import Colors from "../../../constant/Colors";
 import {JokeType} from "../../../util/type/JokesType";
 import Modal from "react-native-modal";
 import {useReduxDispatch} from "../../../redux";
-import {setJokeOpen} from "../../../redux/state/JokeState";
+import {
+    addNewJokeToJokeList,
+    setJokeOpen,
+} from "../../../redux/state/JokeState";
 import {JokeButton} from "../Button/JokeButton";
+import ApiCall from "../../../util/helper/ApiCall";
+import Endpoints from "../../../constant/Endpoints";
 
 type JokeItemProps = {
     joke: JokeType;
@@ -70,6 +75,29 @@ export const JokeList = ({
     isOpened,
 }: JokeListProps): React.ReactElement => {
     const dispatch = useReduxDispatch();
+    const [counter, setCounter] = React.useState(0);
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    const getNewData = async () => {
+        try {
+            setIsLoading(true);
+            const {data} = await ApiCall.get(
+                `${Endpoints.joke}${jokeCategory}?type=single&amount=2`,
+            );
+            data.jokes.forEach((joke: any) => {
+                const dataNewItem: JokeType = {
+                    id: Math.random(),
+                    joke: joke.joke,
+                };
+                dispatch(addNewJokeToJokeList({id: jokeId, joke: dataNewItem}));
+            });
+            setCounter(counter + 1);
+            setIsLoading(false);
+        } catch (e) {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <View
             style={{
@@ -83,7 +111,7 @@ export const JokeList = ({
                     dispatch(setJokeOpen({id: jokeId, open: !isOpened}));
                 }}
                 style={{
-                    width: "95%",
+                    width: "100%",
                     paddingVertical: 10,
                     paddingHorizontal: 20,
                     height: 50,
@@ -112,9 +140,11 @@ export const JokeList = ({
                             style={{
                                 paddingHorizontal: 5,
                                 paddingVertical: 3,
-                                backgroundColor: "#6FB2D2",
+                                backgroundColor: Colors.blue,
                             }}>
-                            <MediumText>TOP</MediumText>
+                            <MediumText style={{color: "black"}}>
+                                TOP
+                            </MediumText>
                         </View>
                     </View>
                 ) : (
@@ -144,21 +174,34 @@ export const JokeList = ({
             {isOpened ? (
                 <View
                     style={{
-                        width: "93%",
+                        width: "98%",
                         marginLeft: "2%",
                         borderLeftWidth: 0.5,
                         borderRightWidth: 0.5,
                         borderBottomWidth: 0.5,
                     }}>
                     {jokes.map(joke => {
-                        return (
-                            <JokeItem
-                                key={joke.id}
-                                joke={joke}
-                                // onPress={onPress}
-                            />
-                        );
+                        return <JokeItem key={joke.id} joke={joke} />;
                     })}
+                    {counter > 1 ? null : isLoading ? (
+                        <ActivityIndicator
+                            size="small"
+                            color={Colors.activity}
+                        />
+                    ) : (
+                        <TouchableOpacity
+                            onPress={getNewData}
+                            style={{
+                                paddingHorizontal: 5,
+                                paddingVertical: 5,
+                                backgroundColor: Colors.blue,
+                                alignItems: "center",
+                            }}>
+                            <RegularText style={{color: "black"}}>
+                                Add more data
+                            </RegularText>
+                        </TouchableOpacity>
+                    )}
                 </View>
             ) : null}
         </View>

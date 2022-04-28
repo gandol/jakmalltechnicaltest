@@ -57,11 +57,11 @@ const JokeReducer = createReducer(initialState, builder => {
             //find id in list
             // @ts-ignore
             const index = jokeList.findIndex((item: JokeType) => {
-                return item.id === idJokeLis;
+                return item.id == idJokeLis;
             });
             if (index !== -1) {
                 // @ts-ignore
-                jokeList[index] = action.payload.joke;
+                jokeList[index].jokes.push(action.payload.joke);
             }
             state.data = jokeList;
         })
@@ -76,7 +76,6 @@ const JokeReducer = createReducer(initialState, builder => {
             const index = jokeList.findIndex(function (item: JokeType) {
                 return item.id === idJokeLis;
             });
-            console.log(index, idJokeLis);
             if (index !== -1) {
                 jokeList.unshift(jokeList.splice(index, 1)[0]);
             }
