@@ -2,6 +2,7 @@ import React, {useEffect} from "react";
 import {
     ActivityIndicator,
     RefreshControl,
+    SafeAreaView,
     ScrollView,
     View,
 } from "react-native";
@@ -65,10 +66,14 @@ export default function MainApp(): React.ReactElement {
     }, []);
 
     if (jokeList.length === 0) {
-        return <ActivityIndicator size="small" color={Colors.activity} />;
+        return (
+            <SafeAreaView>
+                <ActivityIndicator size="small" color={Colors.activity} />
+            </SafeAreaView>
+        );
     }
     return (
-        <View style={{flex: 1, backgroundColor: "white"}}>
+        <SafeAreaView style={{flex: 1, backgroundColor: "white"}}>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 refreshControl={
@@ -92,6 +97,6 @@ export default function MainApp(): React.ReactElement {
                 })}
                 <View style={{height: 20}} />
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
