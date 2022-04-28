@@ -31,7 +31,7 @@ export default function MainApp(): React.ReactElement {
         }
     };
 
-    const getCategorties = async () => {
+    const getCategories = async () => {
         try {
             const {data} = await ApiCall.get(Endpoints.categories);
             const categories = data.categories;
@@ -53,8 +53,7 @@ export default function MainApp(): React.ReactElement {
     };
 
     useEffect(() => {
-        getCategorties();
-        // dispatch(resetJokeList());
+        getCategories();
     }, []);
 
     if (jokeList.length === 0) {
